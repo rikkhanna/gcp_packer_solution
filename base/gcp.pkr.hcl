@@ -17,7 +17,7 @@ source "googlecompute" "debian" {
     subnetwork = "demo-sub"
     ssh_clear_authorized_keys = true
     use_iap = true
-    ssh_timeout = 10m
+    ssh_timeout = "10m" 
 
 }
 
