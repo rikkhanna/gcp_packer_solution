@@ -15,6 +15,9 @@ source "googlecompute" "debian" {
     ssh_password  = var.password
     network = "demo"
     subnetwork = "demo-sub"
+    ssh_clear_authorized_keys = true
+    use_iap = true
+    ssh_timeout = 10m
 
 }
 
