@@ -18,6 +18,12 @@ variable "project_id" {
     type = string
     default = "rish-dev"
 }
+variable "user" {
+    type = string
+}
+variable "password" {
+    type = string
+}
 
 build {
   sources = ["source.googlecompute.debian1190"]
