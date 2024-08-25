@@ -14,7 +14,7 @@ source "googlecompute" "debian" {
 
 }
 
-variable {
+variable "project_id" {
     type = string
     default = "rish-dev"
 }
