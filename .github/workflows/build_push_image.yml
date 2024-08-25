@@ -1,0 +1,72 @@
+name: Build GCP image
+run-name: Build and push `${{ inputs.service }}`
+on:
+  workflow_dispatch:
+    inputs:
+      service:
+        description: 'Service to build'
+        required: true
+        type: choice
+        options:
+          - elasticsearch
+          - haproxy
+          - jenkins
+          - mongo
+          - bi-mongo
+          - rke
+          - services
+          - base
+      debug:
+        description: 'Debug mode'
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  build-image:
+    runs-on: ubuntu-latest
+    permissions:
+        contents: 'read'
+        id-token: 'write'
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+
+      - name: Authenticate with GCP
+        uses: 'google-github-actions/auth@v2'
+        with:
+          project_id: 'rish-dev'
+          token_format: "access_token"
+          service_account: 'my-service-account@rish-dev.iam.gserviceaccount.com'
+          workload_identity_provider: 'projects/636883269497/locations/global/workloadIdentityPools/gitcheck/providers/my-gh-repo'
+
+      - name: Setup `packer`
+        uses: hashicorp/setup-packer@main
+
+      - name: Prepare packer variables
+        id: prepare-variables
+        run: |
+          echo "user=\"${{ secrets.USERNAME }}\"" >> ./variables.pkrvars.hcl
+          echo "password=\"${{ secrets.PASSWORD }}\"" >> ./variables.pkrvars.hcl
+        working-directory: ./${{ inputs.service }}
+
+      - name: Initialize packer (`packer init`)
+        id: init
+        run: "packer init ./gcp.pkr.hcl"
+        working-directory: ./${{ inputs.service }}
+
+      - name: Validate packer script (`packer validate`)
+        id: validate
+        run: "packer validate -var-file=./variables.pkrvars.hcl ./gcp.pkr.hcl"
+        working-directory: ./${{ inputs.service }}
+
+      - name: Build images (`packer build`)
+        id: build
+        run: "packer build -var-file=./variables.pkrvars.hcl ./gcp.pkr.hcl"
+        working-directory: ./${{ inputs.service }}
+
+      - name: Remove packer variables
+        if: "${{ always() }}"
+        id: remove-variables
+        run: "rm ./variables.pkrvars.hcl"
+        working-directory: ./${{ inputs.service }}
