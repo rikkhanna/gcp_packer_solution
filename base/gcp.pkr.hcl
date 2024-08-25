@@ -14,6 +14,7 @@ source "googlecompute" "debian" {
     ssh_username  = var.user
     ssh_password  = var.password
     network = "demo"
+    subnetwork = "demo-sub"
 
 }
 
