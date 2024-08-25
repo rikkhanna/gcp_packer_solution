@@ -13,6 +13,7 @@ source "googlecompute" "debian" {
     zone = "us-central1-a"
     ssh_username  = var.user
     ssh_password  = var.password
+    network = "demo"
 
 }
 
