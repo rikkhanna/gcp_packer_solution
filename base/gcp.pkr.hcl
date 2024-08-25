@@ -26,5 +26,5 @@ variable "password" {
 }
 
 build {
-  sources = ["source.googlecompute.debian1190"]
+  sources = ["source.googlecompute.debian"]
 }
